@@ -9,7 +9,7 @@
     player having two face up cards.
     The player can request additional cards (hit, action=1) until they decide to stop
     (stick, action=0) or exceed 21 (bust).
-    After the player sticks, the dealer reveals their facedown card, and draws
+    After the player sticks, the dealer reveals their face down card, and draws
     until their sum is 17 or greater.  If the dealer goes bust the player wins.
     If neither player nor dealer busts, the outcome (win, lose, draw) is
     decided by whose sum is closer to 21.
@@ -39,24 +39,32 @@
     ### Version History
     * v0: Initial versions release (1.0.0)
 """
+
+
 def initialise(gym):
-    env  = gym.make('Blackjack-v1', natural = True)
+    env = gym.make('Blackjack-v1', natural=True)
     print("Setting up Env")
     return env
-def initialise_values(env,np):
-    state_space = np.zeros((200, 3))
+
+
+def initialise_values(env, np):
+    state_space = np.zeros((400, 3))
     action_space = np.array([0, 1])
-    Q = {}
+    q = {}
     returns = {}
     ctr = 0
+    policy = {}
 
-    for total in range(12, 22):
+    for total in range(4, 23):
         for dealer in range(1, 11):
             for uace in range(0, 2):
                 state_space[ctr] = (np.array([total, dealer, uace]))
                 for action in action_space:
-                    Q[(total, dealer, uace), action] = 0
+                    q[(total, dealer, uace), action] = 0
                     returns[(total, dealer, uace), action] = 0
                 ctr += 1
-    #print(Q)
-    return Q, returns, action_space, state_space
+
+    # we start with a uniform random policy
+    for state in state_space:
+        policy[(state[0], state[1], state[2])] = (0.5, 0.5)  # both action hit and stick have same probability in start
+    return q, returns, action_space, state_space, policy
